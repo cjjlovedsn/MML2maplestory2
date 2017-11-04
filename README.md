@@ -1,0 +1,2 @@
+# MML2maplestory2
+mid文件通过3ML Editor 2转换成mml文件之后。可以转换成合适的格式导入到冒险岛2的乐谱中
