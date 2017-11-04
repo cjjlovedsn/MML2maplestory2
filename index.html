@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style type="text/css">
+			li label {
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<input type="file" name="" id="" value="" multiple="multiple" />
+		<label for="lang">编码：</label>
+		<select name="lang" class="lang" id="lang">
+			<option value="gb2312" selected>gb2312</option>
+			<option value="utf-8">utf-8</option>
+		</select>
+		<label for="vol">音量(V)：</label>
+		<select name="vol" id="vol">
+			<option value="0">1</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+			<option value="10">10</option>
+			<option value="11">11</option>
+			<option value="12">12</option>
+			<option value="13">13</option>
+			<option value="14">14</option>
+			<option value="15" selected>15</option>
+		</select>
+		<label for="motion">演奏动作(M)：</label>
+		<select name="motion" id="motion">
+			<option value="0">0</option>
+			<option value="1" selected>1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+		</select>
+		<label for="speed">动作速度(P)：</label>
+		<input type="number" name="" id="speed" min="32" max="255" value="120" />
+		<label for="tempo">音速(T)：(32-255)</label>
+		<input type="number" name="" id="tempo" min="32" max="255" value="120" />
+		<h4>输出：</h4>
+		<ul class="results"></ul>
+		<script type="text/javascript">
+			var inputFile = document.querySelector('input')
+			var lang = document.querySelector('.lang')
+			var vol = document.querySelector('#vol')
+			var motion = document.querySelector('#motion')
+			var speed = document.querySelector('#speed')
+			var tempo = document.querySelector('#tempo')
+			var arr = []
+			inputFile.addEventListener('change', function () {
+				var files = Array.from(this.files)
+				var v = 'v' + vol.value
+				var m = 'm' + motion.value
+				var p = 'p' + speed.value
+				var t = 't' + tempo.value
+				files.forEach(function (item) {
+					var fr = new FileReader()
+					var file = fr.readAsText(item, lang.value)
+					fr.onload = function (event) {
+						arr.push(event.target.result)
+						if (arr.length === files.length) {
+							var ret = handler()
+							var html = ''
+							var index = 0
+							ret.forEach(function (tracks) {
+								tracks.forEach(function (track) {
+									if (track) {
+										var value = t + v + track
+										value = index ? value : (p + m + value)
+										html += `<li><label for='track${index}'>音轨${index ? `和音${String.fromCharCode(64 + index)}` : '音乐'}</label><textarea id="track${index}" rows="10" cols="30" >${value}</textarea></li>`
+										index++
+									}
+								})
+							})
+							document.querySelector('.results').innerHTML = html
+						}
+					}
+				})
+			})
+			
+			function handler () {
+				var reg1 = /(\[Settings\])|(\/\*M\s+\d+\s+\*\/\s+)|(\/\*[^\/]+\/)|(\w+=.*)|(\r\n|\s+)/gi
+				var reg2 = /\[[^\]]+\]/
+				return arr.map(function (content) {
+					return content.replace(reg1, function (a) {return ''}).replace(/\s+/g, '').split(reg2).map(function (track) {
+						if (track) {
+							var numArr = track.match(/\d+\.*(?!\d)/g)
+							var temp = {}
+							numArr.forEach(function (n) {
+								temp[n] > -1 ? temp[n]++ : (temp[n] = 0)
+							})
+							var newArr = Object.entries(temp).sort(function ([key, value], [k, v]) {
+								return k.length * v -  key.length * value
+							})
+							var max = newArr[0][0] // 音轨中数目最多的数值
+							return 'l' + max + track.replace(new RegExp(max + '\(?!\\d\)', 'g'), '')
+						}
+						return track
+					})
+				})
+			}
+		</script>
+	</body>
+</html>
