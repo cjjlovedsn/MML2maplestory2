@@ -78,7 +78,7 @@
 									if (track) {
 										var value = t + v + track
 										value = index ? value : (p + m + value)
-										html += `<li><label for='track${index}'>音轨${index ? `和音${String.fromCharCode(64 + index)}` : '音乐'}</label><textarea id="track${index}" rows="10" cols="30" >${value}</textarea></li>`
+										html += `<li><label for='track${index}'>${index ? `和音${String.fromCharCode(64 + index)}` : '音乐'}</label><textarea id="track${index}" rows="10" cols="30" >${value}</textarea></li>`
 										index++
 									}
 								})
